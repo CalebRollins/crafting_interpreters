@@ -76,14 +76,12 @@ class Scanner
 				if (match('/'))
 					// A comment goes until the end of the line
 					while (peek() != '\n' && !isAtEnd()) advance();
+				else if (match('*'))
+					multilineComment();
 				else
 					addToken(Slash);
 				break;
-			case ' ':
-			case '\r':
-			case '\t':
-				// Ignore whitespace
-				break;
+			case ' ': case '\r': case '\t': break;
 			case '\n':
 				line++;
 				break;
@@ -97,6 +95,31 @@ class Scanner
 					Error.error(line, $"Unexpected character {c}");
 				break;
 		}
+	}
+
+	private void multilineComment()
+	{
+		// How many unclosed /*'s have we encountered?
+		int unclosedCount = 1;
+
+		while (!isAtEnd())
+		{
+			if (match('/') && match('*'))
+				unclosedCount++;
+			else if (match('*') && match('/'))
+			{
+				unclosedCount--;
+				if (unclosedCount == 0)
+					break;
+			}
+			else if (match('\n'))
+				line++;
+			else
+				advance();
+		}
+
+		if (unclosedCount > 0)
+			Error.error(line, "Unclosed multi-line comment");
 	}
 
 	private bool isAlphaNumeric(char c) => isAlpha(c) || isDigit(c);
@@ -141,6 +164,7 @@ class Scanner
 		{
 			// We allow multi-line strings.
 			// So if we hit a new line then we need to advance to the next line.
+			// TODO: Should handle both kinds of new-lines?
 			if (peek() == '\n') line++;
 			advance();
 		}
