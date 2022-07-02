@@ -155,7 +155,7 @@ class Scanner
 			while (isDigit(peek())) advance();
 		}
 
-		addToken(Number, Double.Parse(source[start..current]));
+		addToken(Num, Double.Parse(source[start..current]));
 	}
 
 	private void str()
@@ -179,7 +179,7 @@ class Scanner
 		advance();
 
 		string value = source[(start + 1)..(current - 1)];
-		addToken(TokenType.String, value);
+		addToken(Str, value);
 	}
 
 	private char peek()

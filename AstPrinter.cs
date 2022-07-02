@@ -2,7 +2,7 @@ using System.Text;
 
 class AstPrinter : Expr.Visitor<string>
 {
-	string print(Expr expr) => expr.accept(this);
+	public string print(Expr expr) => expr.accept(this);
 
 	public string visitBinaryExpr(Expr.Binary expr) =>
 		parenthesize(expr.op.lexeme, expr.left, expr.right);

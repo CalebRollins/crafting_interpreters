@@ -16,14 +16,14 @@ abstract class Expr
 		public readonly Token op;
 		public readonly Expr right;
 
-		Binary(Expr left, Token op, Expr right)
+		public Binary(Expr left, Token op, Expr right)
 		{
 			this.left = left;
 			this.op = op;
 			this.right = right;
 		}
 
-		public override R accept<R>(Visitor<R> visitor) =>
+		public override R accept<R>(Visitor<R> visitor) => 
 			visitor.visitBinaryExpr(this);
 	}
 
@@ -31,25 +31,25 @@ abstract class Expr
 	{
 		public readonly Expr expression;
 
-		Grouping(Expr expression)
+		public Grouping(Expr expression)
 		{
 			this.expression = expression;
 		}
 
-		public override R accept<R>(Visitor<R> visitor) =>
+		public override R accept<R>(Visitor<R> visitor) => 
 			visitor.visitGroupingExpr(this);
 	}
 
 	public class Literal : Expr
 	{
-		public readonly object value;
+		public readonly object? value;
 
-		Literal(object value)
+		public Literal(object? value)
 		{
 			this.value = value;
 		}
 
-		public override R accept<R>(Visitor<R> visitor) =>
+		public override R accept<R>(Visitor<R> visitor) => 
 			visitor.visitLiteralExpr(this);
 	}
 
@@ -58,13 +58,13 @@ abstract class Expr
 		public readonly Token op;
 		public readonly Expr right;
 
-		Unary(Token op, Expr right)
+		public Unary(Token op, Expr right)
 		{
 			this.op = op;
 			this.right = right;
 		}
 
-		public override R accept<R>(Visitor<R> visitor) =>
+		public override R accept<R>(Visitor<R> visitor) => 
 			visitor.visitUnaryExpr(this);
 	}
 

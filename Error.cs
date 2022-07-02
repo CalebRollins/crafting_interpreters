@@ -10,6 +10,14 @@ class Error
 		report(line, "", message);
 	}
 
+	public static void error(Token token, string message)
+	{
+		if (token.type == TokenType.EOF)
+			report(token.line, " at end", message);
+		else
+			report(token.line, $" at '{token.lexeme}'", message);
+	}
+
 	private static void report(int line, string where, string message)
 	{
 		Console.Error.WriteLine($"[line {line}] Error{where}: {message}");

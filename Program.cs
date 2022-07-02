@@ -6,7 +6,7 @@ class Lox
 	{
 		if (args.Length > 1)
 		{
-			Console.WriteLine("Usage: jlox [script]");
+			Console.Error.WriteLine("Usage: jlox [script]");
 			// Exit codes are as defined in the UNIX "sysexits.h" header
 			Environment.Exit(64);
 		}
@@ -22,7 +22,6 @@ class Lox
 
 	private static void runFile(string path)
 	{
-		// TODO: need to convert to path type? does that exist in C#?
 		byte[] bytes = File.ReadAllBytes(path);
 		// TODO: correct encoding?
 		run(Encoding.UTF8.GetString(bytes));
@@ -46,9 +45,12 @@ class Lox
 	{
 		var scanner = new Scanner(source);
 		List<Token> tokens = scanner.scanTokens();
-		foreach (var token in tokens)
-		{
-			Console.WriteLine(token.toString());
-		}
+
+		var parser = new Parser(tokens);
+		Expr? expression = parser.parse();
+
+		if (Error.HadError || expression == null) return;
+
+		Console.WriteLine(new AstPrinter().print(expression));
 	}
 }

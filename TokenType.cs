@@ -7,7 +7,7 @@ enum TokenType
 	Bang, BangEqual, Equal, EqualEqual, Greater, GreaterEqual, Less, LessEqual,
 
 	// Literals
-	Identifier, String, Number,
+	Identifier, Str, Num,
 
 	// Keywords
 	And, Class, Else, False, Fun, For, If, Nil, Or, Print, Return, Super, This, True, Var, While, EOF
