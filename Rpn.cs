@@ -12,5 +12,5 @@ class RPN : Expr.Visitor<string>
 		expr.value == null ? "nil" : expr.value.ToString()!;
 
 	public string visitUnaryExpr(Expr.Unary expr) =>
-		$"{print(expr.right)} {expr.op.lexeme}";
+		$"{print(expr.right)}{expr.op.lexeme}";
 }
