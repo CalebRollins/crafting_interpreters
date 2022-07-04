@@ -68,6 +68,8 @@ class Scanner
 			case '+': addToken(Plus); break;
 			case ';': addToken(Semicolon); break;
 			case '*': addToken(Star); break;
+			case '?': addToken(Question); break;
+			case ':': addToken(Colon); break;
 			case '!': addToken(match('=') ? BangEqual : Bang); break;
 			case '=': addToken(match('=') ? EqualEqual : Equal); break;
 			case '<': addToken(match('=') ? LessEqual : Less); break;

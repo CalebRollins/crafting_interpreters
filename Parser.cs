@@ -9,11 +9,11 @@ class Parser
 		this.tokens = tokens;
 	}
 
-	private bool isAtEnd() => peek().type == EOF;
-
 	private Token peek() => tokens[current];
 
 	private Token previous() => tokens[current - 1];
+
+	private bool isAtEnd() => peek().type == EOF;
 
 	private bool check(TokenType type)
 	{
@@ -45,12 +45,6 @@ class Parser
 		return false;
 	}
 
-	private Token consume(TokenType type, string message)
-	{
-		if (check(type)) return advance();
-		throw error(peek(), message);
-	}
-
 	private class ParseExpection : Exception { }
 	private ParseExpection error(Token token, string message)
 	{
@@ -59,7 +53,17 @@ class Parser
 	}
 
 	/// <summary>
-	/// Gets the parser back into a state where it can continue parsing after a panic
+	/// Advances if the current token is of type `type`,
+	/// otherwise throws an error with `message`
+	/// </summary>
+	private Token consume(TokenType type, string message)
+	{
+		if (check(type)) return advance();
+		throw error(peek(), message);
+	}
+
+	/// <summary>
+	/// Advances the Parser to a point where it can continue parsing after a panic
 	/// </summary>
 	private void synchronize()
 	{
@@ -71,7 +75,7 @@ class Parser
 		while (!isAtEnd())
 		{
 			// Semicolons within a for loop may be a false positive here, but that's ok.
-			// We already successfully showed the first error and we're avoiding cascading errors is done on a best-effort basis.
+			// We already successfully showed the first error and we're avoiding cascading errors on a best-effort basis.
 			if (previous().type == Semicolon) return;
 
 			// Tokens we would expect to see at the beginning of a statement
@@ -81,7 +85,6 @@ class Parser
 
 			advance();
 		}
-
 	}
 
 	private Expr leftAssociative(Func<Expr> op, params TokenType[] types)
@@ -94,7 +97,24 @@ class Parser
 		return expr;
 	}
 
-	private Expr expression() => equality();
+	private Expr expression() => ternary();
+
+	// ternary -> equality "?" ternary ":" ternary
+	//          | equality 
+	private Expr ternary()
+	{
+		// TODO: Does the following expression make sense? Maybe it is syntatically correct, but non-booleans will always evaluate to false?
+		// "lorem ipsum" ? true : false 
+		// Will probably revisit once we get to conditionals. If you remove this, remove the ? and : tokentypes 
+		Expr expr = equality();
+		if (match(Question))
+		{
+			expr = new Expr.Binary(expr, previous(), ternary());
+			consume(Colon, "Expected ':' for ternary expression.");
+			return new Expr.Binary(expr, previous(), ternary());
+		}
+		else return expr;
+	}
 	private Expr equality() => leftAssociative(comparison, BangEqual, EqualEqual);
 	private Expr comparison() => leftAssociative(term, Greater, GreaterEqual, Less, LessEqual);
 	private Expr term() => leftAssociative(factor, Minus, Plus);
@@ -106,6 +126,7 @@ class Parser
 		else
 			return primary();
 	}
+
 	private Expr primary()
 	{
 		if (match(False)) return new Expr.Literal(false);
