@@ -3,7 +3,8 @@
 /// </summary>
 class Error
 {
-	public static Boolean HadError { get; set; } = false;
+	public static bool HadError { get; set; } = false;
+	public static bool HadRuntimeError { get; set; } = false;
 
 	public static void error(int line, string message)
 	{
@@ -16,6 +17,12 @@ class Error
 			report(token.line, " at end", message);
 		else
 			report(token.line, $" at '{token.lexeme}'", message);
+	}
+
+	internal static void runtimeError(RuntimeException ex)
+	{
+		Console.Error.WriteLine($"{ex.Message}\n[line {ex.token.line}]");
+		HadRuntimeError = true;
 	}
 
 	private static void report(int line, string where, string message)

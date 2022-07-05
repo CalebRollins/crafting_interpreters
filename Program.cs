@@ -2,6 +2,8 @@
 
 class Lox
 {
+	private static readonly Interpreter interpreter = new Interpreter();
+
 	static void Main(string[] args)
 	{
 		if (args.Length > 1)
@@ -23,10 +25,9 @@ class Lox
 	private static void runFile(string path)
 	{
 		byte[] bytes = File.ReadAllBytes(path);
-		// TODO: correct encoding?
 		run(Encoding.UTF8.GetString(bytes));
-
 		if (Error.HadError) Environment.Exit(65);
+		if (Error.HadRuntimeError) Environment.Exit(70);
 	}
 
 	private static void runPrompt()
@@ -51,6 +52,6 @@ class Lox
 
 		if (Error.HadError || expression == null) return;
 
-		Console.WriteLine(new AstPrinter().print(expression));
+		interpreter.interpret(expression);
 	}
 }
