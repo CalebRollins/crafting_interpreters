@@ -1,8 +1,8 @@
 abstract class Expr
 {
-	public abstract R accept<R>(Visitor<R> visitor);
+	internal abstract R accept<R>(Visitor<R> visitor);
 
-	public interface Visitor<R>
+	internal interface Visitor<R>
 	{
 		R visitBinaryExpr(Binary expr);
 		R visitGroupingExpr(Grouping expr);
@@ -10,61 +10,61 @@ abstract class Expr
 		R visitUnaryExpr(Unary expr);
 	}
 
-	public class Binary : Expr
+	internal class Binary : Expr
 	{
-		public readonly Expr left;
-		public readonly Token op;
-		public readonly Expr right;
+		internal readonly Expr left;
+		internal readonly Token op;
+		internal readonly Expr right;
 
-		public Binary(Expr left, Token op, Expr right)
+		internal Binary(Expr left, Token op, Expr right)
 		{
 			this.left = left;
 			this.op = op;
 			this.right = right;
 		}
 
-		public override R accept<R>(Visitor<R> visitor) => 
+		internal override R accept<R>(Visitor<R> visitor) => 
 			visitor.visitBinaryExpr(this);
 	}
 
-	public class Grouping : Expr
+	internal class Grouping : Expr
 	{
-		public readonly Expr expression;
+		internal readonly Expr expression;
 
-		public Grouping(Expr expression)
+		internal Grouping(Expr expression)
 		{
 			this.expression = expression;
 		}
 
-		public override R accept<R>(Visitor<R> visitor) => 
+		internal override R accept<R>(Visitor<R> visitor) => 
 			visitor.visitGroupingExpr(this);
 	}
 
-	public class Literal : Expr
+	internal class Literal : Expr
 	{
-		public readonly object? value;
+		internal readonly object? value;
 
-		public Literal(object? value)
+		internal Literal(object? value)
 		{
 			this.value = value;
 		}
 
-		public override R accept<R>(Visitor<R> visitor) => 
+		internal override R accept<R>(Visitor<R> visitor) => 
 			visitor.visitLiteralExpr(this);
 	}
 
-	public class Unary : Expr
+	internal class Unary : Expr
 	{
-		public readonly Token op;
-		public readonly Expr right;
+		internal readonly Token op;
+		internal readonly Expr right;
 
-		public Unary(Token op, Expr right)
+		internal Unary(Token op, Expr right)
 		{
 			this.op = op;
 			this.right = right;
 		}
 
-		public override R accept<R>(Visitor<R> visitor) => 
+		internal override R accept<R>(Visitor<R> visitor) => 
 			visitor.visitUnaryExpr(this);
 	}
 
