@@ -133,6 +133,7 @@ class Parser
 		if (match(True)) return new Expr.Literal(true);
 		if (match(Nil)) return new Expr.Literal(null);
 		if (match(Num, Str)) return new Expr.Literal(previous().literal);
+		if (match(Identifier)) return new Expr.Variable(previous());
 		if (match(LeftParen))
 		{
 			Expr expr = expression();
@@ -143,16 +144,62 @@ class Parser
 		throw error(peek(), "Expect expression.");
 	}
 
-	public Expr? parse()
+	private Stmt printStatement()
+	{
+		Expr value = expression();
+		consume(Semicolon, "Expect ';' after value.");
+		return new Stmt.Print(value);
+	}
+
+	private Stmt expressionStatement()
+	{
+		Expr value = expression();
+		consume(Semicolon, "Expect ';' after expression.");
+		return new Stmt.Expression(value);
+	}
+
+	private Stmt statement()
+	{
+		if (match(Print)) return printStatement();
+
+		return expressionStatement();
+	}
+
+	private Stmt? declaration()
 	{
 		try
 		{
-			return expression();
+			if (match(Var)) return varDeclaration();
+			return statement();
 		}
 		catch (ParseExpection ex)
 		{
-			var x = ex; // shutup, roslyn
+			synchronize();
 			return null;
 		}
+	}
+
+	private Stmt? varDeclaration()
+	{
+		Token name = consume(Identifier, "Expect variable name.");
+		Expr? initializer = null;
+		if (match(Equal))
+			initializer = expression();
+		consume(Semicolon, "Expect ';' after variable declaration.");
+		return new Stmt.Var(name, initializer);
+	}
+
+	public List<Stmt> parse()
+	{
+		var statements = new List<Stmt>();
+
+		while (!isAtEnd())
+		{
+			var declar = declaration();
+			if (declar is not null)
+				statements.Add(declar);
+		}
+
+		return statements;
 	}
 }

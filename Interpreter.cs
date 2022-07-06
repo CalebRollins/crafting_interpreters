@@ -1,16 +1,19 @@
 using System.Diagnostics.CodeAnalysis;
 using static TokenType;
 
-class Interpreter : Expr.Visitor<object?>
+class Interpreter : Expr.Visitor<object?>, Stmt.Visitor<object?> // Can't use void as type parameter in C#
 {
+	private Lx.Environment environment = new Lx.Environment();
 	private object? evaluate(Expr expr) => expr.accept(this);
 
-	internal void interpret(Expr expr)
+	private void execute(Stmt statement) => statement.accept(this);
+
+	internal void interpret(List<Stmt> statements)
 	{
 		try
 		{
-			var value = evaluate(expr);
-			Console.WriteLine(stringify(value));
+			foreach (var statement in statements)
+				execute(statement);
 		}
 		catch (RuntimeException ex)
 		{
@@ -126,5 +129,40 @@ class Interpreter : Expr.Visitor<object?>
 		if (obj == null) return false;
 		if (obj is bool) return (bool)obj;
 		return true;
+	}
+
+	public object? visitExpressionStmt(Stmt.Expression stmt)
+	{
+		throw new NotImplementedException();
+	}
+
+	public object? visitPrintStmt(Stmt.Print stmt)
+	{
+		throw new NotImplementedException();
+	}
+
+	object? Stmt.Visitor<object?>.visitExpressionStmt(Stmt.Expression stmt)
+	{
+		evaluate(stmt.expression);
+		return null;
+	}
+
+	object? Stmt.Visitor<object?>.visitPrintStmt(Stmt.Print stmt)
+	{
+		object? value = evaluate(stmt.expression);
+		Console.WriteLine(stringify(value));
+		return null;
+	}
+
+	public object? visitVariableExpr(Expr.Variable expr) => environment.get(expr.name);
+
+	public object? visitVarStmt(Stmt.Var stmt)
+	{
+		object? value = null;
+		if (stmt.initializer != null)
+			value = evaluate(stmt.initializer);
+
+		environment.define(stmt.name.lexeme, value);
+		return null;
 	}
 }

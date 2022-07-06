@@ -7,6 +7,7 @@ abstract class Expr
 		R visitBinaryExpr(Binary expr);
 		R visitGroupingExpr(Grouping expr);
 		R visitLiteralExpr(Literal expr);
+		R visitVariableExpr(Variable expr);
 		R visitUnaryExpr(Unary expr);
 	}
 
@@ -51,6 +52,19 @@ abstract class Expr
 
 		internal override R accept<R>(Visitor<R> visitor) => 
 			visitor.visitLiteralExpr(this);
+	}
+
+	internal class Variable : Expr
+	{
+		internal readonly Token name;
+
+		internal Variable(Token name)
+		{
+			this.name = name;
+		}
+
+		internal override R accept<R>(Visitor<R> visitor) => 
+			visitor.visitVariableExpr(this);
 	}
 
 	internal class Unary : Expr

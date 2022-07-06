@@ -48,10 +48,11 @@ class Lox
 		List<Token> tokens = scanner.scanTokens();
 
 		var parser = new Parser(tokens);
-		Expr? expression = parser.parse();
+		var statements = parser.parse();
 
-		if (Error.HadError || expression == null) return;
+		// Stop if there was a syntax error
+		if (Error.HadError) return;
 
-		interpreter.interpret(expression);
+		interpreter.interpret(statements);
 	}
 }

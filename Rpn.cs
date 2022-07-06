@@ -13,4 +13,9 @@ class RPN : Expr.Visitor<string>
 
 	public string visitUnaryExpr(Expr.Unary expr) =>
 		$"{print(expr.right)}{expr.op.lexeme}";
+
+	public string visitVariableExpr(Expr.Variable expr)
+	{
+		throw new NotImplementedException();
+	}
 }

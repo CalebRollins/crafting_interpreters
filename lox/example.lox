@@ -1,7 +1,11 @@
-var x = "C:\stuff\crafting_interpreters\part_1\lox\example.lox"
-var y = 10;
+print "one";
+print true;
 
 // This is a comment
+
+var a = 1;
+var b = 2;
+print a + b;
 
 /* This is a 
 * multiline
@@ -11,6 +15,3 @@ comment */
 /* nested */ 
 multiline 
 comment */
-
-/* This is an unclosed
-multiline comment

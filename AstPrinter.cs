@@ -16,6 +16,11 @@ class AstPrinter : Expr.Visitor<string>
 	public string visitUnaryExpr(Expr.Unary expr) =>
 		parenthesize(expr.op.lexeme, expr.right);
 
+	public string visitVariableExpr(Expr.Variable expr)
+	{
+		throw new NotImplementedException();
+	}
+
 	private string parenthesize(string name, params Expr[] exprs)
 	{
 		var builder = new StringBuilder();
