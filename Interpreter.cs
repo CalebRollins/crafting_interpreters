@@ -165,4 +165,32 @@ class Interpreter : Expr.Visitor<object?>, Stmt.Visitor<object?> // Can't use vo
 		environment.define(stmt.name.lexeme, value);
 		return null;
 	}
+
+	public object? visitAssignExpr(Expr.Assign expr)
+	{
+		object? value = evaluate(expr.value);
+		environment.assign(expr.name, value);
+		return value;
+	}
+
+	public object? visitBlockStmt(Stmt.Block stmt)
+	{
+		executeBlock(stmt.statements, new Lx.Environment(environment));
+		return null;
+	}
+
+	private void executeBlock(List<Stmt> statements, Lx.Environment environment)
+	{
+		Lx.Environment? previous = this.environment;
+		try
+		{
+			this.environment = environment;
+			foreach (Stmt statement in statements)
+				execute(statement);
+		}
+		finally
+		{
+			this.environment = previous;
+		}
+	}
 }

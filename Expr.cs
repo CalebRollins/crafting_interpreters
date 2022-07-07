@@ -4,11 +4,27 @@ abstract class Expr
 
 	internal interface Visitor<R>
 	{
+		R visitAssignExpr(Assign expr);
 		R visitBinaryExpr(Binary expr);
 		R visitGroupingExpr(Grouping expr);
 		R visitLiteralExpr(Literal expr);
 		R visitVariableExpr(Variable expr);
 		R visitUnaryExpr(Unary expr);
+	}
+
+	internal class Assign : Expr
+	{
+		internal readonly Token name;
+		internal readonly Expr value;
+
+		internal Assign(Token name, Expr value)
+		{
+			this.name = name;
+			this.value = value;
+		}
+
+		internal override R accept<R>(Visitor<R> visitor) => 
+			visitor.visitAssignExpr(this);
 	}
 
 	internal class Binary : Expr

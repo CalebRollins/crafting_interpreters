@@ -4,9 +4,23 @@ abstract class Stmt
 
 	internal interface Visitor<R>
 	{
+		R visitBlockStmt(Block stmt);
 		R visitExpressionStmt(Expression stmt);
 		R visitVarStmt(Var stmt);
 		R visitPrintStmt(Print stmt);
+	}
+
+	internal class Block : Stmt
+	{
+		internal readonly List<Stmt> statements;
+
+		internal Block(List<Stmt> statements)
+		{
+			this.statements = statements;
+		}
+
+		internal override R accept<R>(Visitor<R> visitor) => 
+			visitor.visitBlockStmt(this);
 	}
 
 	internal class Expression : Stmt

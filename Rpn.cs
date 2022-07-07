@@ -2,6 +2,11 @@ class RPN : Expr.Visitor<string>
 {
 	public string print(Expr expr) => expr.accept(this);
 
+	public string visitAssignExpr(Expr.Assign expr)
+	{
+		throw new NotImplementedException();
+	}
+
 	public string visitBinaryExpr(Expr.Binary expr) =>
 		$"{print(expr.left)} {print(expr.right)} {expr.op.lexeme}";
 

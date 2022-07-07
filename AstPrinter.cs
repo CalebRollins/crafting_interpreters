@@ -4,6 +4,11 @@ class AstPrinter : Expr.Visitor<string>
 {
 	public string print(Expr expr) => expr.accept(this);
 
+	public string visitAssignExpr(Expr.Assign expr)
+	{
+		throw new NotImplementedException();
+	}
+
 	public string visitBinaryExpr(Expr.Binary expr) =>
 		parenthesize(expr.op.lexeme, expr.left, expr.right);
 

@@ -97,7 +97,27 @@ class Parser
 		return expr;
 	}
 
-	private Expr expression() => ternary();
+	private Expr expression() => assignment();
+
+	private Expr assignment()
+	{
+		Expr expr = ternary();
+
+		if (match(Equal))
+		{
+			Token equals = previous();
+			Expr value = assignment();
+
+			if (expr is Expr.Variable)
+			{
+				Token name = ((Expr.Variable)expr).name;
+				return new Expr.Assign(name, value);
+			}
+			error(equals, "Invalid assignment target.");
+		}
+
+		return expr;
+	}
 
 	// ternary -> equality "?" ternary ":" ternary
 	//          | equality 
@@ -161,8 +181,23 @@ class Parser
 	private Stmt statement()
 	{
 		if (match(Print)) return printStatement();
+		if (match(LeftBrace)) return new Stmt.Block(block());
 
 		return expressionStatement();
+	}
+
+	private List<Stmt> block()
+	{
+		var statements = new List<Stmt>();
+		while (!check(RightBrace) && !isAtEnd())
+		{
+			var decl = declaration();
+			if (decl is not null)
+				statements.Add(decl);
+		}
+
+		consume(RightBrace, "Expect '}' after block.");
+		return statements;
 	}
 
 	private Stmt? declaration()
@@ -195,9 +230,9 @@ class Parser
 
 		while (!isAtEnd())
 		{
-			var declar = declaration();
-			if (declar is not null)
-				statements.Add(declar);
+			var decl = declaration();
+			if (decl is not null)
+				statements.Add(decl);
 		}
 
 		return statements;
