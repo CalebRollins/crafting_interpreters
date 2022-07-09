@@ -15,11 +15,16 @@ namespace Lx
 		internal object? get(Token name)
 		{
 			if (values.ContainsKey(name.lexeme))
+			{
+				if (values[name.lexeme] == null)
+					throw new RuntimeException(name, $"Unassigned variable '{name.lexeme}'.");
+
 				return values[name.lexeme];
+			}
 
 			if (enclosing is not null) return enclosing.get(name);
 
-			throw new RuntimeException(name, $"Undefined variable {name.lexeme}.");
+			throw new RuntimeException(name, $"Undefined variable '{name.lexeme}'.");
 		}
 
 		internal void assign(Token name, object? value)
