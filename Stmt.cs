@@ -9,6 +9,7 @@ abstract class Stmt
 		R visitIfStmt(If stmt);
 		R visitVarStmt(Var stmt);
 		R visitPrintStmt(Print stmt);
+		R visitWhileStmt(While stmt);
 	}
 
 	internal class Block : Stmt
@@ -80,6 +81,21 @@ abstract class Stmt
 
 		internal override R accept<R>(Visitor<R> visitor) => 
 			visitor.visitPrintStmt(this);
+	}
+
+	internal class While : Stmt
+	{
+		internal readonly Expr condition;
+		internal readonly Stmt body;
+
+		internal While(Expr condition, Stmt body)
+		{
+			this.condition = condition;
+			this.body = body;
+		}
+
+		internal override R accept<R>(Visitor<R> visitor) => 
+			visitor.visitWhileStmt(this);
 	}
 
 }

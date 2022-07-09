@@ -205,4 +205,12 @@ class Interpreter : Expr.Visitor<object?>, Stmt.Visitor<object?> // Can't use vo
 
 		return evaluate(expr.right);
 	}
+
+	public object? visitWhileStmt(Stmt.While stmt)
+	{
+		while (isTruthy(evaluate(stmt.condition)))
+			execute(stmt.body);
+
+		return null;
+	}
 }

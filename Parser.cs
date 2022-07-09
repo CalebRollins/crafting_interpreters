@@ -210,11 +210,75 @@ class Parser
 
 	private Stmt statement()
 	{
+		if (match(For)) return forStatement();
+		if (match(While)) return whileStatment();
 		if (match(If)) return ifStatement();
 		if (match(Print)) return printStatement();
 		if (match(LeftBrace)) return new Stmt.Block(block());
 
 		return expressionStatement();
+	}
+
+	private Stmt forStatement()
+	{
+		consume(LeftParen, "Expect '(' after 'for'.");
+
+		// ( varDecl | exprStmt | ";" )
+		Stmt? initializer;
+		if (match(Semicolon))
+			initializer = null;
+		else if (match(Var))
+			initializer = varDeclaration();
+		else
+			initializer = expressionStatement();
+
+		// expression? ";"
+		Expr? condition = null;
+		if (!check(Semicolon))
+			condition = expression();
+
+		consume(Semicolon, "Expect ';' after loop condition.");
+
+		// expression? ";"
+		Expr? increment = null;
+		if (!check(RightParen))
+			increment = expression();
+
+		consume(RightParen, "Expect ')' after for clauses.");
+
+		Stmt body = statement();
+
+		// For loops are syntactic sugar. Here we do the desugaring.
+		if (increment is not null)
+		{
+			// Execute increment after every execution of body
+			var statements = new List<Stmt> { body, new Stmt.Expression(increment) };
+			body = new Stmt.Block(statements);
+		}
+
+		// Execute the loop while condition is true
+		if (condition is null)
+			condition = new Expr.Literal(true);
+		body = new Stmt.While(condition, body);
+
+		if (initializer is not null)
+		{
+			// Execute initializer once before body
+			var statements = new List<Stmt> { initializer, body };
+			body = new Stmt.Block(statements);
+		}
+
+		return body;
+	}
+
+	private Stmt whileStatment()
+	{
+		consume(LeftParen, "Expect '(' after 'while'.");
+		Expr condition = expression();
+		consume(RightParen, "Expect ')' after while condition.");
+		Stmt body = statement();
+
+		return new Stmt.While(condition, body);
 	}
 
 	private Stmt? declaration()

@@ -1,7 +1,25 @@
 print "one";
 print true;
 
+var a = 0;
+var temp;
+for (var b = 1; a < 10000; b = temp + b) {
+	print a;
+	temp = a;
+	a = b;
+}
 // This is a comment
+
+/*
+var a;
+var b;
+
+a = "assigned";
+
+print a;
+{
+	print b;
+}
 
 var a = "global a";
 var b = "global b";
@@ -23,6 +41,12 @@ print a;
 print b;
 print c;
 
+var x = 1;
+{
+	var x = x + 2;
+	print x;
+}
+*/
 
 /* This is a 
 * multiline

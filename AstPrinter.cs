@@ -18,6 +18,11 @@ class AstPrinter : Expr.Visitor<string>
 	public string visitLiteralExpr(Expr.Literal expr) =>
 		expr.value == null ? "nil" : expr.value.ToString()!;
 
+	public string visitLogicalExpr(Expr.Logical expr)
+	{
+		throw new NotImplementedException();
+	}
+
 	public string visitUnaryExpr(Expr.Unary expr) =>
 		parenthesize(expr.op.lexeme, expr.right);
 
