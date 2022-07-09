@@ -6,6 +6,7 @@ abstract class Stmt
 	{
 		R visitBlockStmt(Block stmt);
 		R visitExpressionStmt(Expression stmt);
+		R visitIfStmt(If stmt);
 		R visitVarStmt(Var stmt);
 		R visitPrintStmt(Print stmt);
 	}
@@ -34,6 +35,23 @@ abstract class Stmt
 
 		internal override R accept<R>(Visitor<R> visitor) => 
 			visitor.visitExpressionStmt(this);
+	}
+
+	internal class If : Stmt
+	{
+		internal readonly Expr condition;
+		internal readonly Stmt thenBranch;
+		internal readonly Stmt? elseBranch;
+
+		internal If(Expr condition, Stmt thenBranch, Stmt? elseBranch)
+		{
+			this.condition = condition;
+			this.thenBranch = thenBranch;
+			this.elseBranch = elseBranch;
+		}
+
+		internal override R accept<R>(Visitor<R> visitor) => 
+			visitor.visitIfStmt(this);
 	}
 
 	internal class Var : Stmt

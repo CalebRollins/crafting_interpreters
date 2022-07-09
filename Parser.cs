@@ -178,14 +178,6 @@ class Parser
 		return new Stmt.Expression(value);
 	}
 
-	private Stmt statement()
-	{
-		if (match(Print)) return printStatement();
-		if (match(LeftBrace)) return new Stmt.Block(block());
-
-		return expressionStatement();
-	}
-
 	private List<Stmt> block()
 	{
 		var statements = new List<Stmt>();
@@ -198,6 +190,31 @@ class Parser
 
 		consume(RightBrace, "Expect '}' after block.");
 		return statements;
+	}
+
+	private Stmt ifStatement()
+	{
+		// "if" "(" expression ")" statement
+		consume(LeftParen, "Expect '(' after 'if'.");
+		Expr condition = expression();
+		consume(RightParen, "Expect ')' after if condition.");
+		Stmt thenBranch = statement();
+
+		// ("else" statement)? ;
+		Stmt? elseBranch = null;
+		if (match(Else))
+			elseBranch = statement();
+
+		return new Stmt.If(condition, thenBranch, elseBranch);
+	}
+
+	private Stmt statement()
+	{
+		if (match(If)) return ifStatement();
+		if (match(Print)) return printStatement();
+		if (match(LeftBrace)) return new Stmt.Block(block());
+
+		return expressionStatement();
 	}
 
 	private Stmt? declaration()

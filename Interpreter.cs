@@ -131,16 +131,6 @@ class Interpreter : Expr.Visitor<object?>, Stmt.Visitor<object?> // Can't use vo
 		return true;
 	}
 
-	public object? visitExpressionStmt(Stmt.Expression stmt)
-	{
-		throw new NotImplementedException();
-	}
-
-	public object? visitPrintStmt(Stmt.Print stmt)
-	{
-		throw new NotImplementedException();
-	}
-
 	object? Stmt.Visitor<object?>.visitExpressionStmt(Stmt.Expression stmt)
 	{
 		evaluate(stmt.expression);
@@ -192,5 +182,27 @@ class Interpreter : Expr.Visitor<object?>, Stmt.Visitor<object?> // Can't use vo
 		{
 			this.environment = previous;
 		}
+	}
+
+	public object? visitIfStmt(Stmt.If stmt)
+	{
+		if (isTruthy(evaluate(stmt.condition)))
+			execute(stmt.thenBranch);
+		else if (stmt.elseBranch is not null)
+			execute(stmt.elseBranch);
+
+		return null;
+	}
+
+	public object? visitLogicalExpr(Expr.Logical expr)
+	{
+		object? left = evaluate(expr.left);
+		if (expr.op.type == Or)
+		{
+			if (isTruthy(left)) return left;
+		}
+		else if (!isTruthy(left)) return left;
+
+		return evaluate(expr.right);
 	}
 }
