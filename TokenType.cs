@@ -10,6 +10,6 @@ enum TokenType
 	Identifier, Str, Num,
 
 	// Keywords
-	And, Class, Else, False, Fun, For, If, Nil, Or, Print, Return, Super, This, True, Var, While, EOF
+	And, Class, Else, False, Fun, For, If, Nil, Or, Print, Ret, Super, This, True, Var, While, EOF
 }
 

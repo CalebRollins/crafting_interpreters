@@ -6,9 +6,11 @@ abstract class Stmt
 	{
 		R visitBlockStmt(Block stmt);
 		R visitExpressionStmt(Expression stmt);
+		R visitFunctionStmt(Function stmt);
 		R visitIfStmt(If stmt);
 		R visitVarStmt(Var stmt);
 		R visitPrintStmt(Print stmt);
+		R visitReturnStmt(Return stmt);
 		R visitWhileStmt(While stmt);
 	}
 
@@ -36,6 +38,23 @@ abstract class Stmt
 
 		internal override R accept<R>(Visitor<R> visitor) => 
 			visitor.visitExpressionStmt(this);
+	}
+
+	internal class Function : Stmt
+	{
+		internal readonly Token name;
+		internal readonly List<Token> parameters;
+		internal readonly List<Stmt> body;
+
+		internal Function(Token name, List<Token> parameters, List<Stmt> body)
+		{
+			this.name = name;
+			this.parameters = parameters;
+			this.body = body;
+		}
+
+		internal override R accept<R>(Visitor<R> visitor) => 
+			visitor.visitFunctionStmt(this);
 	}
 
 	internal class If : Stmt
@@ -81,6 +100,21 @@ abstract class Stmt
 
 		internal override R accept<R>(Visitor<R> visitor) => 
 			visitor.visitPrintStmt(this);
+	}
+
+	internal class Return : Stmt
+	{
+		internal readonly Token keyword;
+		internal readonly Expr? value;
+
+		internal Return(Token keyword, Expr? value)
+		{
+			this.keyword = keyword;
+			this.value = value;
+		}
+
+		internal override R accept<R>(Visitor<R> visitor) => 
+			visitor.visitReturnStmt(this);
 	}
 
 	internal class While : Stmt

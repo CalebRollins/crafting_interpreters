@@ -79,7 +79,7 @@ class Parser
 			if (previous().type == Semicolon) return;
 
 			// Tokens we would expect to see at the beginning of a statement
-			var statementBeginnings = new TokenType[] { Class, For, Fun, If, Print, Return, Var, While };
+			var statementBeginnings = new TokenType[] { Class, For, Fun, If, Print, Ret, Var, While };
 			if (statementBeginnings.Contains(peek().type))
 				return;
 
@@ -144,7 +144,44 @@ class Parser
 		if (match(Bang, Minus))
 			return new Expr.Unary(op: previous(), right: unary());
 		else
-			return primary();
+			return call();
+	}
+
+	private Expr call()
+	{
+		Expr expr = primary();
+
+		while (true)
+		{
+			if (match(LeftParen))
+				expr = finishCall(expr);
+			else
+				break;
+		}
+
+		return expr;
+	}
+
+	/// <summary>
+	/// Parses the argument list
+	/// </summary>
+	private Expr finishCall(Expr callee)
+	{
+		var arguments = new List<Expr>();
+		if (!check(RightParen))
+		{
+			do
+			{
+				if (arguments.Count() >= 255)
+					error(peek(), "Can't have more than 255 arguments.");
+
+				arguments.Add(expression());
+			} while (match(Comma));
+		}
+
+		Token paren = consume(RightParen, "Expect ')' after arguments.");
+
+		return new Expr.Call(callee, paren, arguments);
 	}
 
 	private Expr primary()
@@ -214,9 +251,21 @@ class Parser
 		if (match(While)) return whileStatment();
 		if (match(If)) return ifStatement();
 		if (match(Print)) return printStatement();
+		if (match(Ret)) return returnStatement();
 		if (match(LeftBrace)) return new Stmt.Block(block());
 
 		return expressionStatement();
+	}
+
+	private Stmt returnStatement()
+	{
+		Token keyword = previous();
+		Expr? value = null;
+		if (!check(Semicolon))
+			value = expression();
+
+		consume(Semicolon, "Expect ';' after return value.");
+		return new Stmt.Return(keyword, value);
 	}
 
 	private Stmt forStatement()
@@ -285,6 +334,7 @@ class Parser
 	{
 		try
 		{
+			if (match(Fun)) return function("function");
 			if (match(Var)) return varDeclaration();
 			return statement();
 		}
@@ -293,6 +343,26 @@ class Parser
 			synchronize();
 			return null;
 		}
+	}
+
+	private Stmt? function(string kind)
+	{
+		Token name = consume(Identifier, $"Expect {kind} name.");
+		consume(LeftParen, $"Expect '(' after {kind} name.");
+		var parameters = new List<Token>();
+		if (!check(RightParen))
+		{
+			do
+			{
+				if (parameters.Count() >= 255)
+					error(peek(), "Can't have more than 255 parameters.");
+				parameters.Add(consume(Identifier, "Expect parameter name."));
+			} while (match(Comma));
+		}
+		consume(RightParen, $"Expect ')' after {kind} name.");
+		consume(LeftBrace, $"Expect '{{' before {kind} body.");
+		List<Stmt> body = block();
+		return new Stmt.Function(name, parameters, body);
 	}
 
 	private Stmt? varDeclaration()

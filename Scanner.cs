@@ -16,7 +16,7 @@ class Scanner
 		["nil"] = Nil,
 		["or"] = Or,
 		["print"] = Print,
-		["return"] = Return,
+		["return"] = Ret,
 		["super"] = Super,
 		["this"] = This,
 		["true"] = True,

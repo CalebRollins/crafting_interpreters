@@ -10,6 +10,9 @@ namespace Lx
 			this.enclosing = enclosing;
 		}
 
+		/// <summary>
+		/// Defines a new variable in the current environment
+		/// </summary>
 		internal void define(string name, object? value) => values.Add(name, value);
 
 		internal object? get(Token name)

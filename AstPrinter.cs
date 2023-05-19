@@ -12,6 +12,11 @@ class AstPrinter : Expr.Visitor<string>
 	public string visitBinaryExpr(Expr.Binary expr) =>
 		parenthesize(expr.op.lexeme, expr.left, expr.right);
 
+	public string visitCallExpr(Expr.Call expr)
+	{
+		throw new NotImplementedException();
+	}
+
 	public string visitGroupingExpr(Expr.Grouping expr) =>
 		parenthesize("group", expr.expression);
 

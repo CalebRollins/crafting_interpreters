@@ -10,6 +10,11 @@ class RPN : Expr.Visitor<string>
 	public string visitBinaryExpr(Expr.Binary expr) =>
 		$"{print(expr.left)} {print(expr.right)} {expr.op.lexeme}";
 
+	public string visitCallExpr(Expr.Call expr)
+	{
+		throw new NotImplementedException();
+	}
+
 	public string visitGroupingExpr(Expr.Grouping expr) =>
 		print(expr.expression);
 

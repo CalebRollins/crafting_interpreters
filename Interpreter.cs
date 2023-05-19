@@ -3,7 +3,16 @@ using static TokenType;
 
 class Interpreter : Expr.Visitor<object?>, Stmt.Visitor<object?> // Can't use void as type parameter in C#
 {
-	private Lx.Environment environment = new Lx.Environment();
+	internal readonly Lx.Environment globals = new Lx.Environment();
+	private Lx.Environment environment;
+
+	internal Interpreter()
+	{
+		environment = globals;
+
+		globals.define("clock", new Clock());
+	}
+
 	private object? evaluate(Expr expr) => expr.accept(this);
 
 	private void execute(Stmt statement) => statement.accept(this);
@@ -169,7 +178,7 @@ class Interpreter : Expr.Visitor<object?>, Stmt.Visitor<object?> // Can't use vo
 		return null;
 	}
 
-	private void executeBlock(List<Stmt> statements, Lx.Environment environment)
+	internal void executeBlock(List<Stmt> statements, Lx.Environment environment)
 	{
 		Lx.Environment? previous = this.environment;
 		try
@@ -212,5 +221,39 @@ class Interpreter : Expr.Visitor<object?>, Stmt.Visitor<object?> // Can't use vo
 			execute(stmt.body);
 
 		return null;
+	}
+
+	public object? visitCallExpr(Expr.Call expr)
+	{
+		object? callee = evaluate(expr.callee);
+		var arguments = new List<object?>();
+		foreach (var argument in expr.arguments)
+			arguments.Add(evaluate(argument));
+
+		if (callee is not LoxCallable)
+			throw new RuntimeException(expr.paren, "Can only call functions and classes.");
+
+		LoxCallable function = (LoxCallable)callee;
+
+		if (arguments.Count() != function.arity())
+			throw new RuntimeException(expr.paren, $"Expected {function.arity()} arguments but got {arguments.Count()}.");
+
+		return function.call(this, arguments);
+	}
+
+	public object? visitFunctionStmt(Stmt.Function stmt)
+	{
+		var function = new LoxFunction(stmt, environment);
+		environment.define(stmt.name.lexeme, function);
+		return null;
+	}
+
+	public object? visitReturnStmt(Stmt.Return stmt)
+	{
+		object? value = null;
+		if (stmt.value is not null)
+			value = evaluate(stmt.value);
+
+		throw new Return(value);
 	}
 }

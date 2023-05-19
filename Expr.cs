@@ -6,6 +6,7 @@ abstract class Expr
 	{
 		R visitAssignExpr(Assign expr);
 		R visitBinaryExpr(Binary expr);
+		R visitCallExpr(Call expr);
 		R visitGroupingExpr(Grouping expr);
 		R visitLiteralExpr(Literal expr);
 		R visitLogicalExpr(Logical expr);
@@ -43,6 +44,23 @@ abstract class Expr
 
 		internal override R accept<R>(Visitor<R> visitor) => 
 			visitor.visitBinaryExpr(this);
+	}
+
+	internal class Call : Expr
+	{
+		internal readonly Expr callee;
+		internal readonly Token paren;
+		internal readonly List<Expr> arguments;
+
+		internal Call(Expr callee, Token paren, List<Expr> arguments)
+		{
+			this.callee = callee;
+			this.paren = paren;
+			this.arguments = arguments;
+		}
+
+		internal override R accept<R>(Visitor<R> visitor) => 
+			visitor.visitCallExpr(this);
 	}
 
 	internal class Grouping : Expr
